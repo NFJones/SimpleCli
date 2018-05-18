@@ -353,8 +353,39 @@ namespace SimpleCli
 
             foreach (var arg in optionalArgs)
             {
-                StringBuilder word = new StringBuilder();
+                if (arg.conflicts.Length > 0)
+                {
+                    StringBuilder word = new StringBuilder();
+                    foreach (var conflict in arg.conflicts)
+                    {
+                        conflictsHandled.Add(conflict);
+                        conflictsHandled.Add(arg.name);
 
+                        word.Append("[");
+                        if (arg.type == Arg.Type.BOOLEAN)
+                            word.Append($"-{arg.flag}");
+                        else if (arg.type == Arg.Type.SINGLE)
+                            word.Append($"-{arg.flag} {arg.name.ToUpper()}");
+                        else
+                            word.Append($"-{arg.flag} 'ITEM, ...'");
+
+                        if (this[conflict].type == Arg.Type.BOOLEAN)
+                            word.Append($"|-{this[conflict].flag}");
+                        else if (this[conflict].type == Arg.Type.SINGLE)
+                            word.Append($"|-{this[conflict].flag} {this[conflict].name.ToUpper()}");
+                        else
+                            word.Append($"|-{this[conflict].flag} 'ITEM, ...'");
+
+                        word.Append("]");
+
+                        lineParts.Add(word.ToString());
+                    }
+                }
+            }
+
+            foreach (var arg in optionalArgs)
+            {
+                StringBuilder word = new StringBuilder();
                 if (conflictsHandled.IndexOf(arg.name) != -1)
                     continue;
 
@@ -365,18 +396,6 @@ namespace SimpleCli
                     word.Append($"-{arg.flag} {arg.name.ToUpper()}");
                 else
                     word.Append($"-{arg.flag} 'ITEM, ...'");
-
-                if (arg.conflicts.Length > 0)
-                    foreach (var conflict in arg.conflicts)
-                    {
-                        conflictsHandled.Add(conflict);
-                        if (this[conflict].type == Arg.Type.BOOLEAN)
-                            word.Append($"|-{this[conflict].flag}");
-                        else if (this[conflict].type == Arg.Type.SINGLE)
-                            word.Append($"|-{this[conflict].flag} {this[conflict].name.ToUpper()}");
-                        else
-                            word.Append($"|-{this[conflict].flag} 'ITEM, ...'");
-                    }
                 word.Append("]");
 
                 lineParts.Add(word.ToString());
@@ -385,8 +404,8 @@ namespace SimpleCli
             foreach (var arg in positionalArgs)
                 lineParts.Add($"{arg.name.ToUpper()}");
 
-            buffer.Append(TerminalFormat(lineParts, Util.MultiplyString(indent, 2)));
-            lineParts.Clear();
+            var usageIndent = "Usage: ".Length + name.Length + 1;
+            buffer.Append(TerminalFormat(lineParts, Util.MultiplyString(" ", usageIndent)));
 
             return buffer.ToString();
         }
