@@ -169,10 +169,10 @@ Optional arguments:
 ```
 ### Correct parsing
 ```bash
-> dotnet run -- positional -l '1, 2, 3, 4' -a 'This, is, a, string\, list' -o 4 -p80
+> dotnet run -- positional -l '1, 2, 3, 4' -a 'This, is, a, string\, list' -o 4 -p80 -f
 positional = positional
 optional = 4
-flag = False
+flag = True
 list:
     1
     2
@@ -192,20 +192,16 @@ Operands:
 ```
 ### Conflict parsing
 ```bash
-> dotnet run -- positional -c 5 -l '1, 2, 3, 4' -v 56 -o 4 -p80
+> dotnet run -- positional -c 5 -o 4
 Argument "conflicts" conflicts with argument "optional"
 ```
 ### Override parsing
 ```bash
-> dotnet run -- positional -l '1, 2, 3, 4' -v 1234 -o 4 -p80
+> dotnet run -- positional -v 1234 -o 4
 positional = positional
 optional = 1234
 flag = False
 list:
-    1
-    2
-    3
-    4
 
 string-list:
 
@@ -216,12 +212,12 @@ Operands:
 ```
 ### Validation
 ```bash
-> dotnet run -- positional -l '1, 2, 3, 4' -v 1234 -o 4 -p1234567
+> dotnet run -- positional -p1234567
 Validation failed for "port" = 1234567
 ```
-### Type conversion
+### Type conversion checking
 ```bash
-> dotnet run -- positional -l '1, 2, 3, 4' -o 'A string' -p80
+> dotnet run -- positional -o 'A string'
 Failed to convert "optional" = Int32(A string)
 ```
 ### Post argument operands
