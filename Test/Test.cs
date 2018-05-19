@@ -51,7 +51,7 @@ namespace Test
                            Validator.ValidateString("^[a-z]+$"));
                 parser.Add("port", 
                            'p', 
-                           "This is a custom argument.", 
+                           "This is an integer validated by range.",
                            "80", 
                            Arg.Type.SINGLE,
                            Validator.ValidateInt(0, 65535));

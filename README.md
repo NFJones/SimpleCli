@@ -1,13 +1,15 @@
 # SimpleCli
 SimpleCli is a simple command line argument parser which supports:
- - positional and optional arguments 
- - custom validation delegates
- - custom type conversion delegates
- - default values 
- - boolean, single, and multiple types
- - automatic help text
- - conflicting and overriding arguments 
- - post argument operands
+ - Positional arguments
+ - Optional arguments 
+ - Post argument operands
+ - Automatic help and usage text
+ - Boolean, single, and multiple argument types
+ - Default values 
+ - Custom validation delegates
+ - Custom type conversion delegates
+ - Conflicting arguments
+ - Overriding arguments 
 
 ## Example
 ```csharp
@@ -64,7 +66,7 @@ namespace Test
                            Validator.ValidateString("^[a-z]+$"));
                 parser.Add("port",
                            'p',
-                           "This is a custom argument.",
+                           "This is an integer validated by range.",
                            "80",
                            Arg.Type.SINGLE,
                            Validator.ValidateInt(0, 65535));
@@ -140,7 +142,7 @@ Optional arguments:
         This is a string validated by regex.
         Default: abc
   -p PORT, --port PORT
-        This is a custom argument.
+        This is an integer validated by range.
         Default: 80
 
 ```
