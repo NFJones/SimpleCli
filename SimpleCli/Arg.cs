@@ -32,7 +32,7 @@ namespace SimpleCli
             }
             catch
             {
-                throw new ParseException($"Failed to convert \"{name}\" = {typeof(T).Name}({value})");
+                throw new ParseException($"Failed to convert '{name}' = {typeof(T).Name}({value})");
             }
         }
 
@@ -62,8 +62,8 @@ namespace SimpleCli
             {
                 if(value.Length > 0)
                 {
-                    var arr = Util.SplitArray(value);
-                    var ret = from s in arr select converter(s.Trim());
+                    var arr = Util.ParseArray(value);
+                    var ret = from s in arr select converter(s);
                     return ret.ToArray();
                 }
                 else
@@ -71,7 +71,7 @@ namespace SimpleCli
             }
             catch
             {
-                throw new ParseException($"Failed to convert \"{name}\" = {typeof(T).Name}[]({value})");
+                throw new ParseException($"Failed to convert '{name}' = {typeof(T).Name}[]({value})");
             }
         }
 
@@ -98,7 +98,7 @@ namespace SimpleCli
         public void Validate()
         {
             if (!validator(value))
-                throw new ParseException($"Validation failed for \"{name}\" = {value}");
+                throw new ParseException($"Validation failed for '{name}' = {value}");
         }
 
         public string name { get; set; }

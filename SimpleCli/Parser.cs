@@ -9,6 +9,7 @@ namespace SimpleCli
     {
         public Parser(string name,
                       string[] args,
+                      string version = "0.0.0",
                       int maxWidth = 80,
                       string indent = "        ")
         {
@@ -16,18 +17,25 @@ namespace SimpleCli
             this.args = args;
             this.maxWidth = maxWidth;
             this.indent = indent;
+            this.version = version;
             positionalArgs = new List<PositionalArg>();
             optionalArgs = new List<OptionalArg>();
-            operands = new ArrayList();
+            _operands = new ArrayList();
+            reservedVariablesAreLocked = false;
 
             Add("help",
                 'h',
                 "Displays this help message and exits.",
                 "",
-                Arg.Type.BOOLEAN,
-                Validator.AcceptAll,
-                new string[] { },
-                new string[] { });
+                Arg.Type.BOOLEAN);
+
+            Add("version",
+                'v',
+                "Displays the version.",
+                "",
+                Arg.Type.BOOLEAN);
+
+            reservedVariablesAreLocked = true;
         }
 
         public string Pop(string name = "", bool mustExist = true)
@@ -35,7 +43,7 @@ namespace SimpleCli
             if (Count() == 0)
             {
                 if (mustExist)
-                    throw new ParseException($"Argument: \"{name}\" must be supplied.");
+                    throw new ParseException($"Argument: '{name}' must be supplied.");
                 else
                     return "";
             }
@@ -53,7 +61,7 @@ namespace SimpleCli
             if (Count() == 0)
             {
                 if (mustExist)
-                    throw new ParseException($"Argument: \"{name}\" must be supplied.");
+                    throw new ParseException($"Argument: '{name}' must be supplied.");
                 else
                     return "";
             }
@@ -76,7 +84,7 @@ namespace SimpleCli
         public void Add(string name,
                         string helpText)
         {
-            positionalArgs.Add(new PositionalArg(name, helpText, Validator.AcceptAll));
+            Add(name, helpText, Validator.AcceptAll);
         }
 
         public void Add(string name,
@@ -88,6 +96,18 @@ namespace SimpleCli
                         string[] conflicts,
                         string[] overrides)
         {
+            if (reservedVariablesAreLocked)
+            {
+                if (name == "help")
+                    throw new ParseException($"Argument name 'help' is reserved for the help text.");
+                else if (flag == 'h')
+                    throw new ParseException($"Argument flag 'h' is reserved for the help text.");
+                else if (name == "version")
+                    throw new ParseException($"Argument name 'version' is reserved for the program version.");
+                else if (flag == 'v')
+                    throw new ParseException($"Argument flag 'v' is reserved for the program version.");
+            }
+
             optionalArgs.Add(new OptionalArg(name,
                                              flag,
                                              helpText,
@@ -106,14 +126,14 @@ namespace SimpleCli
                         Arg.ValidatorDelegate validator,
                         string[] conflicts)
         {
-            optionalArgs.Add(new OptionalArg(name,
-                                             flag,
-                                             helpText,
-                                             defaultValue,
-                                             type,
-                                             validator,
-                                             conflicts,
-                                             new string[] { }));
+            Add(name,
+                flag,
+                helpText,
+                defaultValue,
+                type,
+                validator,
+                conflicts,
+                new string[] { });
         }
 
         public void Add(string name,
@@ -123,14 +143,14 @@ namespace SimpleCli
                         Arg.Type type,
                         Arg.ValidatorDelegate validator)
         {
-            optionalArgs.Add(new OptionalArg(name,
-                                             flag,
-                                             helpText,
-                                             defaultValue,
-                                             type,
-                                             validator,
-                                             new string[] { },
-                                             new string[] { }));
+            Add(name,
+                flag,
+                helpText,
+                defaultValue,
+                type,
+                validator,
+                new string[] { },
+                new string[] { });
         }
 
         public void Add(string name,
@@ -139,14 +159,14 @@ namespace SimpleCli
                         string defaultValue,
                         Arg.Type type)
         {
-            optionalArgs.Add(new OptionalArg(name,
-                                             flag,
-                                             helpText,
-                                             defaultValue,
-                                             type,
-                                             Validator.AcceptAll,
-                                             new string[] { },
-                                             new string[] { }));
+            Add(name,
+                flag,
+                helpText,
+                defaultValue,
+                type,
+                Validator.AcceptAll,
+                new string[] { },
+                new string[] { });
         }
 
         private int IndexOfPrefix(ArrayList argList, string prefix)
@@ -163,7 +183,7 @@ namespace SimpleCli
             if (index != -1)
             {
                 for (var i = index + 1; i < argList.Count; i++)
-                    operands.Add(argList[i]);
+                    _operands.Add(argList[i]);
                 argList.RemoveRange(index, argList.Count - index);
             }
         }
@@ -175,6 +195,15 @@ namespace SimpleCli
                 index = argList.IndexOf("--help");
             if (index != -1)
                 throw new ParseException(GetHelp());
+        }
+
+        private void ParseVersion(ArrayList argList)
+        {
+            int index = argList.IndexOf("-v");
+            if (index == -1)
+                index = argList.IndexOf("--version");
+            if (index != -1)
+                throw new ParseException($"{name} {version}");
         }
 
         private void ParseOptionalArg(ArrayList argList, OptionalArg arg)
@@ -247,7 +276,7 @@ namespace SimpleCli
                     if (arg.conflicts.Length > 0)
                         foreach (var conflict in arg.conflicts)
                             if (this[conflict].wasParsed)
-                                throw new ParseException($"Argument \"{arg.name}\" conflicts with argument \"{conflict}\"");
+                                throw new ParseException($"Argument '{arg.name}' conflicts with argument '{conflict}'");
 
                     if (arg.overrides.Length > 0)
                         foreach (var over in arg.overrides)
@@ -265,6 +294,7 @@ namespace SimpleCli
 
             ParseOperands(argList);
             ParseHelp(argList);
+            ParseVersion(argList);
 
             foreach (var arg in optionalArgs)
                 ParseOptionalArg(argList, arg);
@@ -325,7 +355,7 @@ namespace SimpleCli
                     if (arg.name == name)
                         return arg;
 
-                throw new ParseException($"Invalid arg: \"{name}\"");
+                throw new ParseException($"Invalid arg: '{name}'");
             }
             set
             {
@@ -340,7 +370,7 @@ namespace SimpleCli
                 if (arg.name == name)
                     return arg.wasParsed;
 
-            throw new ParseException($"Invalid arg: \"{name}\"");
+            throw new ParseException($"Invalid arg: '{name}'");
         }
 
         private string GetUsageHelp()
@@ -496,11 +526,25 @@ namespace SimpleCli
 
         public string[] args { get; set; }
         public string name { get; set; }
+        public string version { get; set; }
         public int maxWidth { get; set; }
         public string indent { get; set; }
+        private bool reservedVariablesAreLocked;
         private List<PositionalArg> positionalArgs;
         private List<OptionalArg> optionalArgs;
+        private ArrayList _operands;
 
-        public ArrayList operands { get; set; }
+        public string[] operands
+        {
+            get
+            {
+                return (string[])_operands.ToArray(typeof(string));
+            }
+            set
+            {
+                _operands.Clear();
+                _operands.AddRange(value);
+            }
+        }
     }
 }

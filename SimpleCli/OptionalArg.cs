@@ -31,7 +31,7 @@ namespace SimpleCli
             catch
             {
                 if(wasParsed)
-                    throw new ParseException($"Failed to convert \"{name}\" = {typeof(T).Name}({value})");
+                    throw new ParseException($"Failed to convert '{name}' = {typeof(T).Name}({value})");
                 else
                 {
                     value = defaultValue;
@@ -49,7 +49,7 @@ namespace SimpleCli
             catch
             {
                 if(wasParsed)
-                    throw new ParseException($"Failed to convert \"{name}\" = {typeof(T).Name}[]({value})");
+                    throw new ParseException($"Failed to convert '{name}' = {typeof(T).Name}[]({value})");
                 else
                 {
                     value = defaultValue;

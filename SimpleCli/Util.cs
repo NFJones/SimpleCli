@@ -28,25 +28,24 @@ namespace SimpleCli
             return buf.ToString();
         }
 
-        public static string[] SplitArray(string str)
+        public static string[] ParseArray(string str)
         {
             var ret = new ArrayList();
             var buffer = new StringBuilder();
 
-            for(var i = 0; i < str.Length; i++)
+            for (var i = 0; i < str.Length; i++)
             {
-                if(str[i] == ',')
+                if (str[i] == ',')
                 {
-                    if(i > 0 && str[i - 1] == '\\')
+                    if (i > 0 && str[i - 1] == '\\')
                     {
                         buffer.Length--;
                         buffer.Append(',');
                     }
                     else
                     {
-                        ret.Add(buffer.ToString());
+                        ret.Add(buffer.ToString().Trim());
                         buffer.Clear();
-                        i++;
                     }
                 }
                 else
@@ -57,6 +56,21 @@ namespace SimpleCli
             ret.Add(buffer.ToString());
 
             return (string[])ret.ToArray(typeof(string));
+        }
+
+        public static string ArrayToString<T>(T[] arr)
+        {
+            StringBuilder buffer = new StringBuilder();
+            buffer.Append("{");
+            if (arr.Length > 0)
+            {
+                foreach (var v in arr)
+                    buffer.Append($"{v.ToString()}, ");
+                buffer.Length -= 2;
+            }
+            buffer.Append("}");
+
+            return buffer.ToString();
         }
     }
 }

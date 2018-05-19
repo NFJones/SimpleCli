@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 
 namespace SimpleCli
 {
@@ -9,27 +10,53 @@ namespace SimpleCli
             return true;
         }
 
-        public static bool ValidateRange<T>(string arg, Arg.ConverterDelegate<T> converter, T min, T max)
+        public static bool ValidateRange<T>(T arg, T min, T max)
         {
-            dynamic check = converter(arg);
+            dynamic darg = arg;
             dynamic dmin = min;
             dynamic dmax = max;
-            return dmin <= check && check <= dmax;
+            return dmin <= darg && darg <= dmax;
         }
 
-        public static bool ValidateInt(string arg, int min, int max)
+        public static bool ValidateRange<T>(string arg, Arg.ConverterDelegate<T> converter, T min, T max)
         {
-            return ValidateRange<int>(arg, int.Parse, min, max);
+            dynamic darg = converter(arg);
+            dynamic dmin = min;
+            dynamic dmax = max;
+            return ValidateRange(darg, dmin, dmax);
         }
 
-        public static bool ValidateDouble(string arg, double min, double max)
+        public static Arg.ValidatorDelegate ValidateInt(int min, int max)
         {
-            return ValidateRange<double>(arg, double.Parse, min, max);
+            Arg.ValidatorDelegate ret = (string arg) => {
+                return ValidateRange(arg, int.Parse, min, max);
+            };
+            return ret;
         }
 
-        public static bool ValidateStringLength(string arg, int minLength, int maxLength)
+        public static Arg.ValidatorDelegate ValidateDouble(double min, double max)
         {
-            return ValidateInt(arg.Length.ToString(), minLength, maxLength);
+            Arg.ValidatorDelegate ret = (string arg) => {
+                return ValidateRange(arg, double.Parse, min, max);
+            };
+            return ret;
+        }
+
+        public static Arg.ValidatorDelegate ValidateString(int min, int max)
+        {
+            Arg.ValidatorDelegate ret = (string arg) => {
+                return ValidateRange(arg.Length, min, max);
+            };
+            return ret;
+        }
+
+        public static Arg.ValidatorDelegate ValidateString(string regex)
+        {
+            Arg.ValidatorDelegate ret = (string arg) => {
+                Regex pattern = new Regex(regex);
+                return pattern.IsMatch(arg);
+            };
+            return ret;
         }
     }
 }
