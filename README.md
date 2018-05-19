@@ -132,14 +132,14 @@ namespace Test
 ### Usage help
 ```bash
 > dotnet run
-Usage: mycli [-h] [-o OPTIONAL] [-f] [-l 'ITEM, ...'] [-a 'ITEM, ...']
-                [-c CONFLICTS|-o OPTIONAL] [-v OVERRIDES] [-p PORT] POSITIONAL
+Usage: mycli [-h] [-c CONFLICTS|-o OPTIONAL] [-f] [-l 'ITEM, ...'] [-a 'ITEM, ...']
+             [-v OVERRIDES] [-p PORT] POSITIONAL
 ```
 ### Full help
 ```bash
 > dotnet run -- --help
-Usage: mycli [-h] [-o OPTIONAL] [-f] [-l 'ITEM, ...'] [-a 'ITEM, ...']
-                [-c CONFLICTS|-o OPTIONAL] [-v OVERRIDES] [-p PORT] POSITIONAL
+Usage: mycli [-h] [-c CONFLICTS|-o OPTIONAL] [-f] [-l 'ITEM, ...'] [-a 'ITEM, ...']
+             [-v OVERRIDES] [-p PORT] POSITIONAL
 Positional arguments:
   POSITIONAL
         This is a positional argument.
@@ -190,12 +190,12 @@ overrides = 1234
 port = 80
 Operands:
 ```
-### Conflict parsing
+### Conflicting parsing error
 ```bash
 > dotnet run -- positional -c 5 -o 4
 Argument "conflicts" conflicts with argument "optional"
 ```
-### Override parsing
+### Overriding parsing
 ```bash
 > dotnet run -- positional -v 1234 -o 4
 positional = positional
@@ -210,12 +210,12 @@ overrides = 1234
 port = 80
 Operands:
 ```
-### Validation
+### Validation error
 ```bash
 > dotnet run -- positional -p1234567
 Validation failed for "port" = 1234567
 ```
-### Type conversion checking
+### Type conversion error
 ```bash
 > dotnet run -- positional -o 'A string'
 Failed to convert "optional" = Int32(A string)

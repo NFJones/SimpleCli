@@ -347,7 +347,7 @@ namespace SimpleCli
         {
             StringBuilder buffer = new StringBuilder();
             ArrayList lineParts = new ArrayList();
-            ArrayList conflictsHandled = new ArrayList();
+            ArrayList produced = new ArrayList();
 
             lineParts.Add($"Usage: {name}");
 
@@ -358,8 +358,8 @@ namespace SimpleCli
                     StringBuilder word = new StringBuilder();
                     foreach (var conflict in arg.conflicts)
                     {
-                        conflictsHandled.Add(conflict);
-                        conflictsHandled.Add(arg.name);
+                        produced.Add(conflict);
+                        produced.Add(arg.name);
 
                         word.Append("[");
                         if (arg.type == Arg.Type.BOOLEAN)
@@ -386,7 +386,7 @@ namespace SimpleCli
             foreach (var arg in optionalArgs)
             {
                 StringBuilder word = new StringBuilder();
-                if (conflictsHandled.IndexOf(arg.name) != -1)
+                if (produced.IndexOf(arg.name) != -1)
                     continue;
 
                 word.Append("[");
