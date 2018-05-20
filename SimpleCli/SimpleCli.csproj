@@ -7,9 +7,9 @@
     <PackageId>SimpleCli</PackageId>
     <Title>SimpleCli</Title>
     <Description>A POSIX-like command line argument parser.</Description>
-    <Version>0.0.3</Version>
-    <AssemblyVersion>0.0.3</AssemblyVersion>
-    <FileVersion>0.0.3</FileVersion>
+    <Version>0.0.4</Version>
+    <AssemblyVersion>0.0.4</AssemblyVersion>
+    <FileVersion>0.0.4</FileVersion>
     <PackageLicenseUrl>https://github.com/NFJones/SimpleCli/blob/master/COPYING</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/NFJones/SimpleCli</PackageProjectUrl>
     <RepositoryUrl>https://github.com/NFJones/SimpleCli</RepositoryUrl>
