@@ -9,7 +9,7 @@ namespace Test
         {
             try
             {
-                var parser = new Parser("mycli", args, version: "1.0.0");
+                var parser = new Parser(args, name: "mycli", version: "1.0.0");
 
                 parser.Add("positional", 
                            "This is a positional argument.");

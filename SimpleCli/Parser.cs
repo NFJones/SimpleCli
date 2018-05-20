@@ -7,13 +7,16 @@ namespace SimpleCli
 {
     public class Parser
     {
-        public Parser(string name,
-                      string[] args,
+        public Parser(string[] args,
+                      string name = "",
                       string version = "0.0.0",
                       int maxWidth = 80,
                       string indent = "        ")
         {
-            this.name = name;
+            if (name.Length > 0)
+                this.name = name;
+            else
+                this.name = System.Diagnostics.Process.GetCurrentProcess().ProcessName;
             this.args = args;
             this.maxWidth = maxWidth;
             this.indent = indent;
@@ -36,6 +39,21 @@ namespace SimpleCli
                 Arg.Type.BOOLEAN);
 
             reservedVariablesAreLocked = true;
+        }
+
+        [Obsolete("This constructor is deprecated.")]
+        public Parser(string name,
+                      string[] args,
+                      string version = "0.0.0",
+                      int maxWidth = 80,
+                      string indent = "        ")
+        : this(args,
+               name: name,
+               version: version,
+               maxWidth: maxWidth,
+               indent: indent)
+        {
+
         }
 
         public string Pop(string name = "", bool mustExist = true)
